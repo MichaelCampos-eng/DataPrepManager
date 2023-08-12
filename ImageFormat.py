@@ -1,43 +1,41 @@
 from pdf2image import convert_from_path
-import CustomExceptions
+from CustomExceptions import DirectoryError, FileTypeError
 import os
 import uuid
 import shutil
 import numpy as np
+from PIL import Image
 
-class DataFormat:
+class ImageFormat:
 
     # OK
     def __init__ (self, source_path: str):
         self.source_path = source_path
-    
+
+    # OK 
+    def resize_images(self, factor: int):
+        for file_name in os.listdir(self.source_path):
+            if file_name.endswith(".jpg") or file_name.endswith(".jpeg"):
+                file_path = os.path.join(self.source_path, file_name)
+                image = Image.open(file_path)
+                width, height = image.size
+                target_size = (int(width//factor), int(height//factor))
+                resized_image = image.resize(target_size, Image.LANCZOS)
+                resized_image.save(file_path)
+
     # OK
-    def rename_files_uuid(self, folder_name):
+    def rename_files_uuid(self):
         if not os.path.exists(self.source_path):
             raise DirectoryError("Directory {} does not exist!".format(self.source_path))
 
         files = os.listdir(self.source_path)
         for file in files:
-            self.__convert_file_uuid(file, folder_name)
-    
-    # OK
-    def rename_files_uuid_all(self, folder_names: list[str]):
-        if not os.path.exists(self.source_path):
-            raise DirectoryError("Directory {} does not exist!".format(self.source_path))
-        
-        files = os.listdir(self.source_path)
-        partitions = np.array_split(files, len(folder_names))
-        for i in range(len(partitions)):
-            for file in partitions[i]:
-                self.__convert_file_uuid(file, folder_names[i])
-    
-    # OK
-    def __convert_file_uuid(self, file, folder_name):
-        if not (file.endswith(".jpg") or file.endswith(".jpeg")):
+            folder_name = os.path.basename(self.source_path)
+            if not (file.endswith(".jpg") or file.endswith(".jpeg")):
                 raise FileTypeError("Invalid file type. Remove or convert to jpeg.")
-        imgnameNew = os.path.join(self.source_path, folder_name, folder_name + '.' + '{}.jpeg'.format(str(uuid.uuid1())))
-        imgnameOld = os.path.join(self.source_path, folder_name, file)
-        os.rename(imgnameOld, imgnameNew)
+            imgnameNew = os.path.join(self.source_path, folder_name + '.' + '{}.jpeg'.format(str(uuid.uuid1())))
+            imgnameOld = os.path.join(self.source_path, file)
+            os.rename(imgnameOld, imgnameNew)        
 
     # OK
     def convert_pdf_to_jpeg(self):
