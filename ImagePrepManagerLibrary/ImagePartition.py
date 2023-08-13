@@ -24,7 +24,6 @@ class ImagePartition:
         if not os.path.exists(path):
             raise DirectoryError("Directory {} does not exist!".format(path))
         
-    
         for file in os.listdir(self.source_path):
             if file.endswith(".jpg") or file.endswith(".jpeg"):
                 shutil.move(os.path.join(self.source_path, file), path)
@@ -34,6 +33,8 @@ class ImagePartition:
         file_names = np.array([file for file in os.listdir(self.source_path) if os.path.isfile(os.path.join(self.source_path, file))])
         num_files = len(file_names)
         num_partitions = len(self.partitions_paths)
+
+        print(self.source_path)
         
         part_file_names = np.array_split(file_names, num_partitions)
         for i in range(num_partitions):
@@ -78,7 +79,7 @@ class ImagePartition:
             raise DirectoryError("Image File {} does not exist!".format(img_path))
 
         if not os.path.exists(xml_path):
-            raise DirectoryError("Label file {} does not exist! Format data first.".format(xml_path))
+            raise DirectoryError("Label file {} does not exist! Format or create file.".format(xml_path))
         
         if not os.path.exists(location_path):
             raise DirectoryError("Destination folder {} does not exist!".format(location_path))

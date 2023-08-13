@@ -1,0 +1,6 @@
+Metadata-Version: 2.1
+Name: DataPrepManager
+Version: 0.1.0
+Summary: Prep image manager for machine learning models.
+Author: Michael Campos
+License: MIT
